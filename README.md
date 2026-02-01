@@ -17,16 +17,29 @@ docker build -t mypulumi:latest .
 ```
 
 ## 3. Run and Test the Built Docker Image
+This is intended for local development using local state backend.
+
+Set .env file
+```bash
+cat << EOF > .env
+AWS_ACCESS_KEY_ID=<DIY>
+AWS_SECRET_ACCESS_KEY=<DIY>
+AWS_SESSION_TOKEN=<DIY>
+PULUMI_BACKEND_URL=file://data
+PULUMI_CONFIG_PASSPHRASE=<DIY>
+PULUMI_HOME=/root/.pulumi
+EOF
+```
 
 To run the Pulumi app in preview mode using the built image:
 ```sh
-export PULUMI_BACKEND_URL=file://data
 docker run --rm -it \
 	--env-file ./.env \
-	-v $(pwd)/infra/s3/data:/app/infra/s3/data \
+	-v $(pwd)/data:/app/infra/s3/data \
 	mypulumi:latest \
 	uv run main.py --action preview
 ```
+
 
 Replace `--action preview` with other actions as needed.
 
