@@ -1,4 +1,0 @@
-backend:
-  url: file:///workspaces/pulumi-idp-demo/.pulumi
-name: s3-sample-object
-runtime: python
