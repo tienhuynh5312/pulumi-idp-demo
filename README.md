@@ -37,11 +37,10 @@ EOF
 
 To run the Pulumi app in preview mode using the built image:
 ```sh
-docker run --rm -it \
-	--env-file ./.env \
-	-v $(pwd)/data:/app/infra/s3/data \
-	mypulumi:latest \
-	uv run main.py --action preview
+docker run --rm -it --env-file ./.env \
+    -v $(pwd)/.pulumi/.pulumi:/app/infra/s3/data mypulumi:latest \
+    uv run main.py local-workspace run \
+    --work-dir /app/infra/s3 --action up
 ```
 ---
 Replace `--action preview` with other actions as needed.

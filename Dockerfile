@@ -27,4 +27,4 @@ COPY . /app
 RUN pip install --upgrade pip && pip install uv && uv sync
 
 # Run the app
-CMD ["uv", "run", "main.py"]
+CMD ["uv", "run", "main.py", "local-workspace", "run", "--help"]
