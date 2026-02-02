@@ -3,6 +3,7 @@ import os
 import pathlib
 from typing import Literal, Optional
 from pulumi import automation as auto
+
 # import subprocess
 # import argparse
 
@@ -34,7 +35,7 @@ class LocalWorkspaceConfiguration:
     project_name: str
     stack_name: str
     work_dir: Optional[str] = None
-    backend_url: Optional[str] = None
+    # backend_url: Optional[str] = None
     action: Literal["preview", "up", "destroy"] = "preview"
 
     def work_dir_program(self, subfolder_name: str) -> str:
@@ -45,28 +46,18 @@ def run(config: LocalWorkspaceConfiguration):
     if config.work_dir is None:
         raise ValueError("work_dir must be set")
 
-    if config.backend_url is None:
-        raise ValueError("backend_url must be set")
+    # if config.backend_url is None:
+    #     raise ValueError("backend_url must be set")
 
     work_dir = config.work_dir
 
     stack = auto.create_or_select_stack(
         stack_name=config.stack_name,
         project_name=config.project_name,
-        work_dir=config.work_dir,
-        opts=auto.LocalWorkspaceOptions(
-            # support airgapped environments by specifying a custom pulumi home.
-            # so we can cached plugins and avoid re-downloading on every run.
-            project_settings=auto.ProjectSettings(
-                name=config.project_name,
-                runtime="python",
-                backend=auto.ProjectBackend(url=config.backend_url),
-            ),
-        )
+        work_dir=str(INFRA_FOLDER_PATH / work_dir)
     )
 
     # stack.workspace.install_plugin("aws", "v7.16.0")
-    stack.set_config("aws:region", auto.ConfigValue(value="us-east-1"))
 
     if config.action == "up":
         result = stack.up(on_output=print)
