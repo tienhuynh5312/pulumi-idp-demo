@@ -19,8 +19,13 @@ COPY . /app
 RUN pip install --upgrade pip && pip install uv && uv sync
 
 ENV PATH="${PULUMI_HOME}/bin:$PATH"
-ENV PULUMI_AWS_PLUGIN_VERSION="v7.16.0"
-RUN pulumi plugin install resource aws ${PULUMI_AWS_PLUGIN_VERSION}
+
+ARG PULUMI_PLUGIN_LIST="aws@v7.16.0 datadog@v4.64.0"
+RUN for plugin in $(echo $PULUMI_PLUGIN_LIST); do \
+    provider=$(echo $plugin | cut -d'@' -f1); \
+    version=$(echo $plugin | cut -d'@' -f2); \
+    pulumi plugin install resource "$provider" "$version"; \
+    done
 
 # Run the app
 CMD ["uv", "run", "main.py"]
