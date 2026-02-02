@@ -1,4 +1,8 @@
 # Development & Usage Guide
+## Purpose
+- Inspire by Crossplane implementation. Using Pulumi Automation API we can serve our infrastructure through API
+and/or GitOps.
+- A bit simpler than Crossplane since we don't need Kubernetes abeit we lose advantages of Kubernetes controller nature.
 
 ## 1. Using the Devcontainer
 
@@ -39,12 +43,24 @@ docker run --rm -it \
 	mypulumi:latest \
 	uv run main.py --action preview
 ```
-
-
+---
 Replace `--action preview` with other actions as needed.
 
 Note: by mounting the volume, we can keep local state backend. 
 Otherwise, you state file will be lost between run.
+
+## 4. Local Testing with uv
+
+You can run and test the Pulumi app directly in your devcontainer or local environment (without Docker) using `uv`:
+
+```sh
+uv run main.py local-workspace run --work-dir "$(pwd)/infra/s3/"
+```
+
+- This will execute the Pulumi automation locally, using the code and configuration in `infra/s3/`.
+- Make sure your environment variables (such as AWS credentials and Pulumi config) are set, or use a `.env` file and a tool like `direnv` or `dotenv`.
+
+You can pass additional arguments to `main.py` as needed for your workflow.
 
 ---
 For more details, see the inline comments in the Dockerfile and source code.
