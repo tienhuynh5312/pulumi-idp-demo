@@ -34,7 +34,7 @@ AWS_SECRET_ACCESS_KEY=<DIY>
 AWS_SESSION_TOKEN=<DIY>
 PULUMI_BACKEND_URL=file:///app/.pulumi/data
 PULUMI_CONFIG_PASSPHRASE=<DIY>
-PULUMI_HOME=/root/.pulumi
+PULUMI_HOME=/app/.pulumi
 EOF
 ```
 
@@ -82,33 +82,61 @@ uv run main.py local-workspace run --work-dir "$(pwd)/infra/s3/"
 
 You can pass additional arguments to `main.py` as needed for your workflow.
 
-## 5. Pulumi Automation API Endpoint
 
-This project exposes a FastAPI endpoint for running Pulumi operations programmatically.
+## 5. Pulumi Automation API Endpoints
 
-### Endpoint
+This project exposes a FastAPI application for running Pulumi operations programmatically. The following endpoints are available:
 
-`POST /local-workspace/run`
+### Health Check
 
-**Request Body (JSON):**
-- `work_dir` (str): Relative path to the Pulumi project directory (e.g., `"s3"`).
-- `project_name` (str): Name of the Pulumi project (e.g., `"s3_sample_project"`).
-- `stack_name` (str): Name of the Pulumi stack (e.g., `"dev"`).
-- `action` (str): One of `"preview"`, `"up"`, or `"destroy"`.
+`GET /healthz`
+
+Returns a simple health status.
+
+**Response:**
+```json
+{ "status": "ok" }
+```
+
+### List Local Stacks
+
+`GET /infra/local/{work_dir}`
+
+- `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
+
+Returns a list of available stacks in the specified local workspace.
 
 **Example:**
-
 ```sh
-curl -H "Content-Type: application/json" \
-    -d '{"work_dir": "s3", "project_name": "s3_sample_project", "stack_name": "dev",  "action": "destroy"}' \
-    "http://localhost:8000/local-workspace/run"
+curl "http://localhost:8000/infra/local/s3"
 ```
 
 **Response:**
-- On success: `{ "result": ... }`
-- On error: `{ "error": "..." }`
+```json
+{ "stacks": [ ... ] }
+```
 
-This allows you to trigger Pulumi stack operations via HTTP, enabling integration with other tools or automation workflows.
+### Run Pulumi Action on Local Workspace
+
+`POST /infra/local/{work_dir}/{stack_name}/{action}`
+
+- `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
+- `stack_name` (str): Name of the Pulumi stack (e.g., `dev`).
+- `action` (str): One of `preview`, `up`, or `destroy`. Default is `preview`.
+
+Runs the specified Pulumi action on the given stack.
+
+**Example:**
+```sh
+curl -X POST "http://localhost:8000/infra/local/s3/dev/up"
+```
+
+**Response:**
+```json
+{ "result": ... }
+```
+
+On error, returns HTTP 500 with a JSON error message.
 
 ---
 For more details, see the inline comments in the Dockerfile and source code.

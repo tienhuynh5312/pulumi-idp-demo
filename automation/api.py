@@ -1,14 +1,10 @@
+from inspect import stack
 from typing import Literal
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from automation.cli import LocalWorkspaceConfiguration
-
-
-class LocalWorkspaceSchema(BaseModel):
-    work_dir: str
-    project_name: str
-    stack_name: str
-    action: Literal["preview", "up", "destroy"] = "preview"
+from automation.cli import LocalWorkspaceConfiguration, INFRA_FOLDER_PATH
+from pulumi import automation as auto
+from automation.cli import run
 
 
 fastapi_app = FastAPI()
@@ -19,15 +15,29 @@ def healthz():
     return {"status": "ok"}
 
 
-@fastapi_app.post("/local-workspace/run")
-def run_local_workspace(
-    request: LocalWorkspaceSchema
-):
-    from automation.cli import run
+@fastapi_app.get("/infra/local/{work_dir}")
+def list_local_stacks(
+        work_dir: str):
 
+    work_dir = work_dir
+
+    ws = auto.LocalWorkspace(work_dir=str(INFRA_FOLDER_PATH / work_dir))
+    ws_stacks = ws.list_stacks(include_all=True)
+
+    return {"stacks": ws_stacks}
+
+
+@fastapi_app.post("/infra/local/{work_dir}/{stack_name}/{action}")
+def run_local_workspace(
+    work_dir: str,
+    stack_name: str,
+    action: Literal["preview", "up", "destroy"] = "preview"
+):
     try:
         config = LocalWorkspaceConfiguration(
-            **request.model_dump()
+            work_dir=work_dir,
+            stack_name=stack_name,
+            action=action
         )
         result = run(config)
         return {"result": result}

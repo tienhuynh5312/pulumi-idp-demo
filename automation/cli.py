@@ -1,8 +1,11 @@
 from dataclasses import dataclass
+import logging
 import os
 import pathlib
 from typing import Literal, Optional
 from pulumi import automation as auto
+from pydantic import BaseModel
+
 
 # import subprocess
 # import argparse
@@ -30,16 +33,11 @@ INFRA_FOLDER_PATH = pathlib.Path(
     os.path.join(ROOT_FOLDER_PATH, "infra")).resolve()
 
 
-@dataclass
-class LocalWorkspaceConfiguration:
-    project_name: str
+class LocalWorkspaceConfiguration(BaseModel):
+    work_dir: str
     stack_name: str
-    work_dir: Optional[str] = None
-    # backend_url: Optional[str] = None
+    project_name: Optional[str] = None
     action: Literal["preview", "up", "destroy"] = "preview"
-
-    def work_dir_program(self, subfolder_name: str) -> str:
-        return str(INFRA_FOLDER_PATH / subfolder_name)
 
 
 def run(config: LocalWorkspaceConfiguration):
@@ -57,6 +55,10 @@ def run(config: LocalWorkspaceConfiguration):
         work_dir=str(INFRA_FOLDER_PATH / work_dir)
     )
 
+    region = stack.get_config("aws:region")
+    logging.info(
+        f"Current AWS region: {region.value if region else 'not set'}")
+    stack.set_config("aws:region", auto.ConfigValue(value="us-east-1"))
     # stack.workspace.install_plugin("aws", "v7.16.0")
 
     if config.action == "up":
@@ -67,6 +69,7 @@ def run(config: LocalWorkspaceConfiguration):
         return result.change_summary
     elif config.action == "destroy":
         result = stack.destroy(on_output=print)
+        stack.workspace.remove_stack(config.stack_name)
         return result.summary
     else:
         raise ValueError(f"Unknown action: {config.action}")
