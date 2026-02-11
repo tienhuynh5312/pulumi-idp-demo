@@ -27,17 +27,50 @@ def list_local_stacks(
     return {"stacks": ws_stacks}
 
 
-@fastapi_app.post("/infra/local/{work_dir}/{stack_name}/{action}")
-def run_local_workspace(
+@fastapi_app.put("/infra/local/{work_dir}/{stack_name}")
+def put_local_workspace(
     work_dir: str,
-    stack_name: str,
-    action: Literal["preview", "up", "destroy"] = "preview"
+    stack_name: str
 ):
     try:
         config = LocalWorkspaceConfiguration(
             work_dir=work_dir,
             stack_name=stack_name,
-            action=action
+            action="up"
+        )
+        result = run(config)
+        return {"result": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@fastapi_app.get("/infra/local/{work_dir}/{stack_name}")
+def get_local_workspace(
+    work_dir: str,
+    stack_name: str
+):
+    try:
+        config = LocalWorkspaceConfiguration(
+            work_dir=work_dir,
+            stack_name=stack_name,
+            action="preview"
+        )
+        result = run(config)
+        return {"result": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@fastapi_app.delete("/infra/local/{work_dir}/{stack_name}")
+def delete_local_workspace(
+    work_dir: str,
+    stack_name: str
+):
+    try:
+        config = LocalWorkspaceConfiguration(
+            work_dir=work_dir,
+            stack_name=stack_name,
+            action="destroy"
         )
         result = run(config)
         return {"result": result}

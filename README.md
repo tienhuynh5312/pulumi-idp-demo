@@ -118,17 +118,17 @@ curl "http://localhost:8000/infra/local/s3"
 
 ### Run Pulumi Action on Local Workspace
 
-`POST /infra/local/{work_dir}/{stack_name}/{action}`
+#### Get stack
+`PUT /infra/local/{work_dir}/{stack_name}`
 
 - `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
 - `stack_name` (str): Name of the Pulumi stack (e.g., `dev`).
-- `action` (str): One of `preview`, `up`, or `destroy`. Default is `preview`.
 
 Runs the specified Pulumi action on the given stack.
 
 **Example:**
 ```sh
-curl -X POST "http://localhost:8000/infra/local/s3/dev/up"
+curl -X GET "http://localhost:8000/infra/local/s3/dev"
 ```
 
 **Response:**
@@ -138,5 +138,44 @@ curl -X POST "http://localhost:8000/infra/local/s3/dev/up"
 
 On error, returns HTTP 500 with a JSON error message.
 
+#### Create stack
+`PUT /infra/local/{work_dir}/{stack_name}`
+
+- `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
+- `stack_name` (str): Name of the Pulumi stack (e.g., `dev`).
+
+Runs the specified Pulumi action on the given stack.
+
+**Example:**
+```sh
+curl -X PUT "http://localhost:8000/infra/local/s3/dev"
+```
+
+**Response:**
+```json
+{ "result": ... }
+```
+
+On error, returns HTTP 500 with a JSON error message.
+
+#### Create stack
+`PUT /infra/local/{work_dir}/{stack_name}`
+
+- `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
+- `stack_name` (str): Name of the Pulumi stack (e.g., `dev`).
+
+Runs the specified Pulumi action on the given stack.
+
+**Example:**
+```sh
+curl -X DELETE "http://localhost:8000/infra/local/s3/dev"
+```
+
+**Response:**
+```json
+{ "result": ... }
+```
+
+On error, returns HTTP 500 with a JSON error message.
 ---
 For more details, see the inline comments in the Dockerfile and source code.
