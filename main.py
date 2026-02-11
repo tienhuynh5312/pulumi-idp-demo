@@ -1,6 +1,11 @@
+"""
+Docstring for main
+"""
 from typing import Literal
 import typer
-import os
+import uvicorn
+from automation.cli import run, LocalWorkspaceConfiguration
+from automation.api import fastapi_app
 
 app = typer.Typer()
 local_workspace = typer.Typer()
@@ -8,7 +13,7 @@ app.add_typer(local_workspace, name="local-workspace")
 
 
 @local_workspace.command("run")
-def run(
+def run_local(
     work_dir: str = typer.Option(
         help="Working directory for the Pulumi project"),
     project_name: str = typer.Option(
@@ -18,10 +23,22 @@ def run(
     action: Literal["preview", "up", "destroy"] = typer.Option(
         default="preview", help="Action to perform: up, destroy, or preview"),
     # backend_url: str = typer.Option(
-    #     default="", envvar="PULUMI_BACKEND_URL", help="Backend URL for the Pulumi project", show_envvar=True),
+    #     default="", envvar="PULUMI_BACKEND_URL",
+    #     help="Backend URL for the Pulumi project",
+    #     show_envvar=True)
 ):
-    from automation.cli import run
-    from automation.cli import LocalWorkspaceConfiguration
+    """
+    TODO:Docstring for run_local
+
+    :param work_dir: Description
+    :type work_dir: str
+    :param project_name: Description
+    :type project_name: str
+    :param stack_name: Description
+    :type stack_name: str
+    :param action: Description
+    :type action: Literal["preview", "up", "destroy"]
+    """
 
     config = LocalWorkspaceConfiguration(
         work_dir=work_dir,
@@ -38,8 +55,6 @@ def serve(
     port: int = typer.Option(8000, help="Port to bind the server to"),
 ):
     """Serve a FastAPI endpoint for local workspace operations."""
-    import uvicorn
-    from automation.api import fastapi_app
 
     uvicorn.run(fastapi_app, host=host, port=port)
 

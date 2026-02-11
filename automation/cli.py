@@ -1,4 +1,6 @@
-from dataclasses import dataclass
+"""
+Docstring for automation.cli
+"""
 import logging
 import os
 import pathlib
@@ -34,6 +36,9 @@ INFRA_FOLDER_PATH = pathlib.Path(
 
 
 class LocalWorkspaceConfiguration(BaseModel):
+    """
+    TODO: Docstring for LocalWorkspaceConfiguration
+    """
     work_dir: str
     stack_name: str
     project_name: Optional[str] = None
@@ -41,6 +46,12 @@ class LocalWorkspaceConfiguration(BaseModel):
 
 
 def run(config: LocalWorkspaceConfiguration):
+    """
+    TODO:Docstring for run
+
+    :param config: Description
+    :type config: LocalWorkspaceConfiguration
+    """
     if config.work_dir is None:
         raise ValueError("work_dir must be set")
 
@@ -57,19 +68,21 @@ def run(config: LocalWorkspaceConfiguration):
 
     region = stack.get_config("aws:region")
     logging.info(
-        f"Current AWS region: {region.value if region else 'not set'}")
+        "Current AWS region: %s", region.value if region else 'not set')
     stack.set_config("aws:region", auto.ConfigValue(value="us-east-1"))
     # stack.workspace.install_plugin("aws", "v7.16.0")
 
     if config.action == "up":
         result = stack.up(on_output=print)
         return result.summary
-    elif config.action == "preview":
+
+    if config.action == "preview":
         result = stack.preview(on_output=print)
         return result.change_summary
-    elif config.action == "destroy":
+
+    if config.action == "destroy":
         result = stack.destroy(on_output=print)
         stack.workspace.remove_stack(config.stack_name)
         return result.summary
-    else:
-        raise ValueError(f"Unknown action: {config.action}")
+
+    raise ValueError(f"Unknown action: {config.action}")
