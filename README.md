@@ -119,7 +119,7 @@ curl "http://localhost:8000/infra/local/s3"
 ### Run Pulumi Action on Local Workspace
 
 #### Get stack
-`PUT /infra/local/{work_dir}/{stack_name}`
+`GET /infra/local/{work_dir}/{stack_name}`
 
 - `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
 - `stack_name` (str): Name of the Pulumi stack (e.g., `dev`).
@@ -138,7 +138,7 @@ curl -X GET "http://localhost:8000/infra/local/s3/dev"
 
 On error, returns HTTP 500 with a JSON error message.
 
-#### Create stack
+#### Create or select stack
 `PUT /infra/local/{work_dir}/{stack_name}`
 
 - `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
@@ -158,7 +158,7 @@ curl -X PUT "http://localhost:8000/infra/local/s3/dev"
 
 On error, returns HTTP 500 with a JSON error message.
 
-#### Create stack
+#### Delete stack
 `PUT /infra/local/{work_dir}/{stack_name}`
 
 - `work_dir` (str): Relative path to the Pulumi project directory (e.g., `s3`).
